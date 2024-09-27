@@ -1,4 +1,5 @@
 import sqlite3 as sql
+import time
 
 # method creates the database and the table to store books, can be
 # safely called multiple times, the query checks for existence of a table in the db
@@ -11,7 +12,7 @@ def setupDb():
 
         '''
         CREATE TABLE IF NOT EXISTS Books(
-            id INTEGER PRIMARY KEY AUT,
+            id INTEGER PRIMARY KEY,
             title TEXT NOT NULL,
             author TEXT NOT NULL,
             genre TEXT DEFAULT "Unknown",
@@ -42,7 +43,12 @@ def addBook(title, author, genre, publication_date, ISBN):
         con.commit()
         return True
     except sql.Error as err:
-        print(err) # logs error in console
+        print(err)
+        with open("err_log.txt", "a") as file:
+            file.write("\n")
+            file.write(time.ctime()) #logs errors in a file
+            file.write(str(err))
+            file.write("\n")
         return False
     finally:
         con.close()
@@ -79,10 +85,15 @@ def filterBooks(title='', author='', genre='', publication_date='', ISBN = ''):
     query+=";"
     try:
         res = cursor.execute(query, params)
-        return res # list of tuples matching criteria
+        return res.fetchall() # list of tuples matching criteria
 
     except sql.Error as err:
-        print(err) # logs errors in console
+        print(err)
+        with open("./err_log.txt", "a") as file:
+            file.write("\n")
+            file.write(time.ctime()) #logs errors in a file
+            file.write(str(err))
+            file.write("\n")
         return False
 
     finally:
