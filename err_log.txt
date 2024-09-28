@@ -283,3 +283,5 @@ Sat Sep 28 00:20:09 2024NOT NULL constraint failed: Books.title
 Sat Sep 28 00:20:10 2024NOT NULL constraint failed: Books.title
 
 Sat Sep 28 00:44:39 2024NOT NULL constraint failed: Books.author
+
+Sat Sep 28 10:31:11 2024NOT NULL constraint failed: Books.ISBN

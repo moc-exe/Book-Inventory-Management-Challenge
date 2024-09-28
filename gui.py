@@ -141,7 +141,7 @@ def createGUI():
    
 
     window = sg.Window("Book Inventory", layout, finalize=True, icon=assignIcon())
-
+    window.maximize()
     tableData = None
 
     while True:
@@ -162,9 +162,10 @@ def createGUI():
             res = db.addBook(title, author, genre, publication_date, isbn)
 
             if res:
+                tableData = db.filterBooks()
                 window['status'].update("Book added successfully!")
                 window['status'].update(text_color = "green")
-                window["table"].update(db.filterBooks()) # select * from books
+                window["table"].update(tableData) # select * from books
                 window["title"].update("")
                 window['author'].update("")
                 clearAddInput(window)
@@ -206,6 +207,7 @@ def createGUI():
         if event == "Remove Book":
 
             bookID = tableData[values['table'][0]][0]
+            sg.popup(bookID)
             
             if db.deleteBook(bookID):
                 if db.isEmpty():
