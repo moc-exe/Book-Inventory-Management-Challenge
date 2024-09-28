@@ -31,14 +31,21 @@ def addBook(title, author, genre, publication_date, ISBN):
 
     con = sql.connect('books.db')
     cursor = con.cursor()
-    
+
+    q_title = title if title else None
+    q_author = author if author else None
+    q_genre = genre if genre else None
+    q_publication_date = publication_date if publication_date else None
+    q_ISBN = ISBN if ISBN else None
+
+        
     try:
         # ? placeholders to prevent injections
         cursor.execute(
             '''
             INSERT INTO Books (title, author, genre, publication_date, ISBN)
             VALUES (?, ?, ?, ?, ?)
-            ''', (title, author, genre, publication_date, ISBN)
+            ''', (q_title, q_author, q_genre, q_publication_date, q_ISBN)
         )
         con.commit()
         return True
@@ -99,4 +106,52 @@ def filterBooks(title='', author='', genre='', publication_date='', ISBN = ''):
     finally:
         cursor.close()
         con.close()
+
+def deleteBook(id):
+
+    conn = sql.connect('books.db')
+    cursor = conn.cursor()
+    query = f"DELETE FROM Books WHERE id = {id};"
+
+    try:
+
+        res = cursor.execute(query)
+        conn.commit()
+        return True
+
+    
+    except sql.Error as err:
+        with open("./err_log.txt", "a") as file:
+            file.write("\n")
+            file.write(time.ctime()) #logs errors in a file
+            file.write(str(err))
+            file.write("\n")
+        return False
+    
+    finally:
         
+        cursor.close()
+        conn.close()
+
+def isEmpty():
+
+    conn = sql.connect('books.db')
+    cursor = conn.cursor()
+   
+    try:
+        cursor.execute("SELECT COUNT(*) FROM Books")
+        count = cursor.fetchone()[0]
+        if count == 0:
+            return True
+        else:
+            return False
+    except sql.Error as err: 
+        with open("./err_log.txt", "a") as file:
+            file.write("\n")
+            file.write(time.ctime()) #logs errors in a file
+            file.write(str(err))
+            file.write("\n")
+        return False
+    finally:
+        cursor.close()
+        conn.close()
