@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 import dbmanager as db
+import platform
 
 main_font = "Monospace 11 bold"
 
@@ -19,6 +20,17 @@ def clearSearchInput(window):
     window['search_genre'].update('')
     window["search_publication_date"].update("")
     window["search_isbn"].update("")
+
+def assignIcon():
+    system = platform.system()
+    if system == "Windows":
+        return "./img/app.ico"
+    elif system == "Linux":
+        return "./img/app_icon.png"
+    elif system == "Darwin":
+        return "./img/app_icon.png"
+    else:
+        return None
 
 def createLayout():
 
@@ -91,7 +103,7 @@ def createLayout():
             auto_size_columns=False,
             expand_x=True,
             justification="center",
-            col_widths=[3,20,20,20,20,20,20],
+            col_widths=[3,30,30,30,30,4,20],
             font = "Monospace 11",
             enable_events=True,
             right_click_selects=True,
@@ -99,9 +111,10 @@ def createLayout():
             )
         ],
         [sg.Frame("Export Data",
-                  layout=[[sg.Button("Export CSV")]],
+                  layout=[[sg.Button("Export CSV", size=(15))]],
                   expand_x=True,
-                  font="Monospace 18 bold"
+                  font="Monospace 18 bold",
+                  element_justification="center"
         )]
         ]
     
@@ -114,7 +127,7 @@ def createGUI():
         'TEXT': '#FFB067',
         'INPUT': '#C8C4C1',
         'TEXT_INPUT': '#000000',
-        'SCROLL': '#c7e78b',
+        'SCROLL': '#FFB067',
         'BUTTON': ('#FFB067', '#002134'),
         'PROGRESS': ('#FFB067', '#002134'),
         'BORDER': 1,
@@ -124,7 +137,10 @@ def createGUI():
     sg.theme_add_new("custom1", custom_window_theme)
     sg.theme("custom1")
     layout = createLayout()
-    window = sg.Window("Book Inventory", layout, finalize=True)
+
+   
+
+    window = sg.Window("Book Inventory", layout, finalize=True, icon=assignIcon())
 
     tableData = None
 
@@ -187,11 +203,9 @@ def createGUI():
                 window['status'].update("Your search failed. Try modifying criteria.")
                 window['status'].update(text_color = "red")
             
-        # TODO
         if event == "Remove Book":
 
             bookID = tableData[values['table'][0]][0]
-            sg.popup(bookID)
             
             if db.deleteBook(bookID):
                 if db.isEmpty():
@@ -227,6 +241,22 @@ def createGUI():
             else:
                 window['status'].update("Internal error, couldn't display all books")
                 window['status'].update(text_color = "red")
+
+        if event == "Export CSV":
+
+            if db.isEmpty():
+                window['status'].update("Export failed, inventory is currently empty")
+                window['status'].update(text_color = "red")
+                tableData = [[]]
+                window['table'].update(tableData)
+            else:
+                filename = sg.popup_get_file('Please select a file to save', save_as=True, icon=assignIcon)
+                if filename and db.exportCSV(filename):
+                    window['status'].update(f"Exported successfully to f{filename}")
+                    window['status'].update(text_color = "green")
+                else:
+                    window['status'].update(f"Export to {filename} failed")
+                    window['status'].update(text_color = "red")
 
     window.close()
 

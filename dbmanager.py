@@ -1,5 +1,6 @@
 import sqlite3 as sql
 import time
+import csv
 
 # method creates the database and the table to store books, can be
 # safely called multiple times, the query checks for existence of a table in the db
@@ -72,22 +73,22 @@ def filterBooks(title='', author='', genre='', publication_date='', ISBN = ''):
     params = []
 
     if title:
-        query += f" AND title=?"
-        params.append(title)
+        query += " AND title LIKE ?"
+        params.append(f'%{title}%')
     if author:
-        query += f" AND author= ?"
-        params.append(author)
+        query += " AND author LIKE ?"
+        params.append(f'%{author}%')
     if genre:
-        query += f" AND genre= ?"
-        params.append(genre)
+        query += ' AND genre LIKE ?'
+        params.append(f'%{genre}%')
     
     if publication_date:
-        query += f" AND publication_date= ?"
-        params.append(publication_date)
+        query += f" AND publication_date LIKE ?"
+        params.append(f'%{publication_date}%')
     
     if ISBN:
-        query += f" AND ISBN= ?"
-        params.append(ISBN)
+        query += f" AND ISBN LIKE ?"
+        params.append(f'%{ISBN}%')
 
     query+=";"
     try:
@@ -107,6 +108,7 @@ def filterBooks(title='', author='', genre='', publication_date='', ISBN = ''):
         cursor.close()
         con.close()
 
+# deletes a book from the db, when provided with a valid id, else returns false
 def deleteBook(id):
 
     conn = sql.connect('books.db')
@@ -133,6 +135,7 @@ def deleteBook(id):
         cursor.close()
         conn.close()
 
+#checks if the db is empty
 def isEmpty():
 
     conn = sql.connect('books.db')
@@ -155,3 +158,30 @@ def isEmpty():
     finally:
         cursor.close()
         conn.close()
+
+# helper to export to a csv file from the db, the filename is provided in the gui module
+def exportCSV(filename):
+    conn = sql.connect('books.db')
+    cursor = conn.cursor()
+    try:
+        cursor.execute('SELECT * FROM Books')
+        books = cursor.fetchall()
+        
+        with open(filename, 'w', newline='') as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(['Entry ID', 'Title', 'Author', 'Genre', 'Publication Date', 'ISBN'])
+            writer.writerows(books)
+
+        return True
+
+    except sql.Error as err:
+        with open("./err_log.txt", "a") as file:
+            file.write("\n")
+            file.write(time.ctime()) #logs errors in a file
+            file.write(str(err))
+            file.write("\n")
+        return False
+    
+    finally:
+        conn.close()
+        
