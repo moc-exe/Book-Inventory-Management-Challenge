@@ -141,7 +141,6 @@ def createGUI():
    
 
     window = sg.Window("Book Inventory", layout, finalize=True, icon=assignIcon())
-    window.maximize()
     tableData = None
 
     while True:
