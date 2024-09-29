@@ -34,7 +34,7 @@ git clone https://github.com/moc-exe/Book-Inventory-Management-Challenge.git
 4) navigate to the directory and run main `python3 main.py`
 5) Accept terms for free trial of the GUI 
 ----
-#### _2) On Windows_
+#### _2) On Windows_ 
 
 #####  Clone the repo
 #
@@ -54,6 +54,7 @@ git clone https://github.com/moc-exe/Book-Inventory-Management-Challenge.git
 2) install PySimpleGUI `pip install PySimpleGUI`
 3) navigate to the project directory and run main `python main.py`
 
-
+----
+### Questions? --- mailto:lev.ustinov@gmail.com
 
 
